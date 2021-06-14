@@ -11,7 +11,6 @@ function getResults(err, res) {
   if (err) {
     console.log(err);
   } else {
-    console.log(res, "res");
     for (let i = 0; i < res.length; i++) {
       let obj = res[i];
       stroke(0, 255, 0); //
