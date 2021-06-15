@@ -11,6 +11,10 @@ let glassButton;
 var glass = false;
 let classCard = 0;
 let imageCar = 0;
+let slider;
+let predictor;
+
+//REGRESSION
 // loss or cost  is the function  to  calculate the error
 function modelReady() {
   console.log("model Ready");
@@ -26,15 +30,15 @@ function gotResults(error, res) {
     console.log(error, "error");
   } else {
     console.log(res, "res");
-    label = res[0].label;
+    label = res.value;
 
-    classifier.classify(gotResults);
+    predictor.predict(gotResults);
   }
 }
 function isTrainingMechine(loss) {
   if (loss === null) {
     console.log("Training is Done");
-    classifier.classify(gotResults);
+    predictor.predict(gotResults);
   } else {
     console.log(loss);
   }
@@ -47,49 +51,33 @@ function setup() {
   background(0);
   mobileNet = ml5.featureExtractor("MobileNet", modelReady);
   classifier = mobileNet.classification(video, videoIsReady);
-  cardButton = createButton("card");
-  cardButton.mousePressed(function () {
-    classifier.addImage("card");
-    classCard++;
-    console.log(classCard);
-    imageCard = true;
-  });
-  glassButton = createButton("glassButton");
-  glassButton.mousePressed(function () {
-    let i = classifier.addImage("glass");
-    console.log(i);
-    imageCard++;
-    glass = true;
+  predictor = mobileNet.regression(video, videoIsReady);
+
+  slider = createSlider(0, 1, 0, 0.01);
+  slider.input(function () {
+    console.log(slider.value());
   });
 
-  // carButton = createButton("smartPhone");
-  // carButton.mousePressed(function () {
-  //   let i = classifier.addImage("smartPhone");
-  //   console.log(i);
+  let sliderButton = createButton("Add Number");
+  sliderButton.mousePressed(function () {
+    predictor.addImage(slider.value());
+  });
 
-  //   imagecar = true;
   // });
 
   trainButton = createButton("train");
   trainButton.mousePressed(function () {
-    if (classCard > 8 && imageCard > 8) {
-      classifier.train(isTrainingMechine);
-    }
-
-    // else if (imageCard === true && imagecar == false) {
-    //   classifier.train(isTrainingMechine);
-    // } else if (imageCard === false && imagecar == true) {
-    //   classifier.train(isTrainingMechine);
-    // }
-    else {
-      alert("error");
-    }
+    predictor.train(isTrainingMechine);
   });
 }
 
 function draw() {
   background(0);
   image(video, 0, 0);
+
+  rectMode(CENTER);
+  fill(255, 0, 100);
+  rect(label * width, height / 2, 50, 50);
   fill(255);
   textSize(18);
   text(label, 10, height - 5);
