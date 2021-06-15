@@ -1,8 +1,6 @@
 let mobileNet;
 let video;
 let knn;
-let labels;
-let ready;
 
 // KEY NEAREST NEIGHBOUR
 //REGRESSION
@@ -23,12 +21,11 @@ function modelReady() {
 function setup() {
   createCanvas(640, 500);
   video = createCapture(VIDEO);
-  // video.size(320, 240);
+  video.size(320, 240);
   video.hide();
   background(0);
   mobileNet = ml5.featureExtractor("MobileNet", modelReady);
   knn = ml5.KNNClassifier();
-  labels = createP("Must To Train");
 }
 // function mousePressed() {
 //   const logits = mobileNet.infer(video);
@@ -36,41 +33,31 @@ function setup() {
 //   logits.print();
 // }
 
-function goClassify() {
-  const logits = mobileNet.infer(video);
-  knn.classify(logits, function (err, res) {
-    if (err) {
-      console.log(err);
-    } else {
-      labels.html(res.label);
-      console.log(res);
-      goClassify();
-    }
-  });
+function getResult(err, res) {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(res);
+  }
 }
-// function mousePressed() {
-//   const logits = mobileNet.infer(video);
-//   if (knn.getNumLabels() > 0) {
-//     knn.classify(logits, getResult);
-//   }
-// }
+function mousePressed() {
+  const logits = mobileNet.infer(video);
+  if (knn.getNumLabels() > 0) {
+    knn.classify(logits, getResult);
+  }
+}
 function keyPressed() {
   const logits = mobileNet.infer(video);
   if (keyCode === LEFT_ARROW) {
     console.log("left");
     knn.addExample(logits, "left");
-  } else if (keyCode == RIGHT_ARROW) {
-    console.log("right");
-    knn.addExample(logits, "right");
   } else {
-    knn.addExample(logits, "up");
+    console.log("right");
+    knn.addExample(logits, "left");
   }
+  knn.addExample(logits, "right");
 }
 
 function draw() {
   image(video, 0, 0);
-  if (!ready && knn.getNumLabels() > 0) {
-    goClassify();
-    ready = true;
-  }
 }
