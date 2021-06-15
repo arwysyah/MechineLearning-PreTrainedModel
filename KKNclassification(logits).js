@@ -2,14 +2,7 @@ let mobileNet;
 let video;
 var label;
 let classifier;
-
-//REGRESSION
-// loss or cost  is the function  to  calculate the error
-
-//SCALAR = single number(0 dimension) ==> 5
-//VECTOR = list of number (1 dimension) = [1,2,3,4,4]
-//MATRIX = 2 dimension [[1,2,34]]
-//TENSOR = all dimensions
+// KKN classification
 function modelReady() {
   console.log("model Ready");
 }
