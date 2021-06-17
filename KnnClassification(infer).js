@@ -28,7 +28,14 @@ function setup() {
   background(0);
   mobileNet = ml5.featureExtractor("MobileNet", modelReady);
   knn = ml5.KNNClassifier();
-  labels = createP("Must To Train");
+  labels = createP("Kamu Butuh Melatih Komputer");
+  // if (labels === "right") {
+  //   labels = "Kamu di Kanan";
+  // } else if (labels === "left") {
+  //   labels = "Kamu di Kiri";
+  // } else {
+  //   labels = "Kamu Di Tengah";
+  // }
 }
 // function mousePressed() {
 //   const logits = mobileNet.infer(video);
@@ -58,12 +65,12 @@ function keyPressed() {
   const logits = mobileNet.infer(video);
   if (keyCode === LEFT_ARROW) {
     console.log("left");
-    knn.addExample(logits, "left");
+    knn.addExample(logits, "Kamu Di Kiri");
   } else if (keyCode == RIGHT_ARROW) {
     console.log("right");
-    knn.addExample(logits, "right");
+    knn.addExample(logits, "Kamu Di Kanan");
   } else {
-    knn.addExample(logits, "up");
+    knn.addExample(logits, "Kamu Di Tengah ");
   }
 }
 

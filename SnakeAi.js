@@ -335,13 +335,89 @@ function modelReady() {
 
 function setup() {
   createCanvas(400, 400);
-  video = new Walker();
+  video = createCapture(VIDEO);
   // video.size(320, 240);
   // video.hide();
   background(0);
+  mobileNet = ml5.featureExtractor("MobileNet", modelReady);
+  knn = ml5.KNNClassifier();
+  labels = createP("Kamu Butuh Melatih Komputer");
+  s = new Snake();
+  frameRate(10);
+  pickLocation();
 }
-// console.log(video);
+function goClassify() {
+  const logits = mobileNet.infer(video);
+  knn.classify(logits, function (err, res) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(res, "response");
+      labels.html(res.label);
+      result = res.label;
+      console.log(res);
+      goClassify();
+    }
+  });
+}
+
+function pickLocation() {
+  if (labels) {
+    let cols = floor(width / scl);
+    let rows = floor(height / scl);
+    food = createVector(floor(random(cols)), floor(random(rows)));
+    food.mult(scl);
+  }
+}
+
+function mousePressed() {
+  s.total++;
+}
+
 function draw() {
-  video.step();
-  video.render();
+  background(51);
+  if (!ready && knn.getNumLabels() > 0) {
+    goClassify();
+    ready = true;
+  }
+  if (s.eat(food)) {
+    pickLocation();
+  }
+  // s.death();
+
+  s.update();
+  s.show();
+  fill(255, 0, 100);
+  rect(food.x, food.y, scl, scl);
+  movement();
+}
+
+function movement() {
+  console.log(result, "res");
+  if (result === "up") {
+    s.dir(0, -1);
+  } else if (result === "down") {
+    s.dir(0, 1);
+  } else if (result === "right") {
+    s.dir(1, 0);
+  } else if (result === "left") {
+    s.dir(-1, 0);
+  }
+}
+
+function keyPressed() {
+  const logits = mobileNet.infer(video);
+  if (keyCode === LEFT_ARROW) {
+    console.log("left");
+    knn.addExample(logits, "left");
+  } else if (keyCode == RIGHT_ARROW) {
+    console.log("right");
+    knn.addExample(logits, "right");
+  } else if (keyCode == UP_ARROW) {
+    console.log("up");
+    knn.addExample(logits, "up");
+  } else if (keyCode == DOWN_ARROW) {
+    console.log("down");
+    knn.addExample(logits, "down");
+  }
 }
